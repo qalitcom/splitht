@@ -47,8 +47,12 @@ select,input{width:100%;box-sizing:border-box;padding:10px 12px;font-size:16px;b
     </select>
   </div>
   <div class="row">
-    <label for="qty">Quantity</label>
+    <label for="qty">Quantity (количество билетов в лоте)</label>
     <input id="qty" type="number" min="1" value="10" inputmode="numeric">
+  </div>
+  <div class="row">
+    <label for="shown">Shown quantity (необязательно, меньше Quantity)</label>
+    <input id="shown" type="number" min="1" inputmode="numeric" placeholder="Shown Quantity">
   </div>
   <div class="row hidden" id="customRow">
     <label for="custom">Разрешённые количества (через запятую или пробел)</label>
@@ -59,6 +63,7 @@ select,input{width:100%;box-sizing:border-box;padding:10px 12px;font-size:16px;b
 <div class="card">
   <label>Результат в HT</label>
   <div class="result" id="result">—</div>
+  <div class="note" id="eff"></div>
 </div>
 
 <div class="card sets" id="setsCard">
@@ -91,7 +96,10 @@ const same=(a,b)=>a.length===b.length&&a.every((v,i)=>v===b[i]);
 
 function calc(){
   const mode=$('mode').value;
-  const n=Math.max(1,parseInt($('qty').value)||1);
+  const q=Math.max(1,parseInt($('qty').value)||1);
+  const sh=parseInt($('shown').value);
+  const n=(sh>=1&&sh<q)?sh:q;
+  $('eff').textContent=n!==q?`Расчёт идёт от Shown Quantity: ${n} (Quantity: ${q})`:`Расчёт идёт от Quantity: ${q}`;
   const pairs=range(1,n).filter(x=>x%2===0);
   const avoid=range(1,n).filter(x=>x!==n-1);
   const all=range(1,n);
@@ -114,7 +122,7 @@ function calc(){
   }
   $('result').textContent=HT[r];
 }
-['mode','qty','custom'].forEach(i=>$(i).addEventListener('input',calc));
+['mode','qty','shown','custom'].forEach(i=>$(i).addEventListener('input',calc));
 calc();
 </script>
 </body>
